@@ -1,0 +1,13 @@
+INICIAR GETAWAY
+npm run gateway (iniciarlo en una terminal aparte)
+
+GETAWAY (tambien se inician en una 3 terminal aparte)
+PETICION ACEPTADA
+Invoke-RestMethod -Method Post -Uri http://localhost:4000/pedidos -ContentType 'application/json' -Body '{"cliente":"Ana","items":["a","b"],"total":5000}' | ConvertTo-Json -Depth 5
+
+PETICION CON $0 (Aca de aplico el try catch para que no lance las letras rojas, si no que aparezca los detalles del pedido con el insert=false, es mas de estetica)
+try {
+  Invoke-RestMethod -Method Post -Uri http://localhost:4000/pedidos -ContentType 'application/json' -Body '{"cliente":"Ana","items":["a","b"],"total":0}'
+} catch {
+  $_.ErrorDetails.Message | ConvertFrom-Json | ConvertTo-Json -Depth 5
+} 

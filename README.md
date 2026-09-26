@@ -1,28 +1,25 @@
-# Gestión de Pedidos — Actividad práctica
-
-Proyecto base en React + Vite para la actividad práctica de **Patrones y
-principios de diseño — Parte 1** (patrones estructurales, de integración y
-de comunicación).
-
-Las instrucciones completas, los tiempos y la rúbrica están en la guía en
-Word que entrega el docente (`Actividad-Practica-Patrones-Parte1.docx`).
-Este README solo cubre cómo levantar el proyecto.
+Actividad Individual Estudiante: <Julian_Alexander_Santos_Montero>
 
 ## Cómo ejecutar
-
 ```bash
 npm install
 npm run dev
 ```
+Abrir `http://localhost:5173`.
 
-Abre la URL que muestra la terminal (por defecto `http://localhost:5173`).
+## Qué se implementó
+**En clase**
+- **Adapter** (`services/pagos/AdapterPasarelaY.js`): adapta SdkPasarelaY (centavos, rechaza la promesa) al contrato `IPago`.
+- **Facade** (`patterns/FachadaPedidos.js`): orquesta inventario → pago → envío → evento; corta si el pago falla.
+- **MVVM** (`viewmodel/usePedidosViewModel.js` + `components/OrdersView.jsx`): lógica en el ViewModel, Vista pura.
 
-## Dónde trabajar
+**Tarea**
+- **Retry** (`patterns/retry.js`): reintentos con backoff exponencial.
+- **Circuit Breaker** (`patterns/CircuitBreaker.js`): CERRADO / ABIERTO / SEMI-ABIERTO. Aplicado a `inventario.reservar` (retry por fuera, breaker por dentro). La UI muestra "Inventario no disponible, intenta más tarde" con el circuito abierto.
+- **Eventos** (`patterns/eventBus.js`, `patterns/notificacionesSubscriber.js`): la Fachada publica `pedido:envio-programado`; el suscriptor (registrado en `main.jsx`) envía la notificación. La Fachada no importa `notificaciones.js`.
 
-- `src/services/pagos/AdapterPasarelaY.js` — Ejercicio 1 (Adapter)
-- `src/patterns/FachadaPedidos.js` — Ejercicio 2 (Facade)
-- `src/viewmodel/usePedidosViewModel.js` y `src/components/OrdersView.jsx` —
-  Ejercicio 3 (refactor a MVVM), partiendo de `src/OrdersApp.jsx`
-
-Busca los comentarios `TODO(Ejercicio N)` en el código: son el punto exacto
-donde debes escribir tu solución.
+## Cómo probar el Circuit Breaker
+`inventario.reservar` falla ~30 % de las veces. Para forzarlo desde la consola del navegador:
+1. `window.PROBABILIDAD_FALLA = 1` → enviar 2 pedidos (el circuito se abre).
+2. Esperar 5 s y `window.PROBABILIDAD_FALLA = 0` → enviar un pedido (SEMI-ABIERTO → CERRADO).
+Las transiciones se ven en la consola (`[CircuitBreaker] ...`).
